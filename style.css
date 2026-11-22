@@ -9,7 +9,7 @@ body {
 main {
   max-width: 680px;
   margin: 0 auto;
-  padding: 48px 20px 80px;
+  padding: 48px 240px 80px 20px;
 }
 
 h1 {
@@ -60,7 +60,7 @@ button:disabled {
   font-size: 18px;
 }
 
-ol {
+.reply ol {
   margin: 0;
   padding: 0;
   list-style: none;
@@ -69,9 +69,63 @@ ol {
   gap: 8px 20px;
 }
 
-li {
+.reply li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   margin: 0;
   padding: 8px 0;
   border-bottom: 1px solid #e4ddd0;
   font-size: 18px;
+}
+
+button.star,
+button.remove {
+  margin: 0;
+  padding: 0 4px;
+  border-radius: 0;
+  background: transparent;
+  color: #1c1a17;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.saved-box {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  width: 200px;
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  background: #fffdf8;
+  border: 1px solid #c9c2b4;
+}
+
+.saved-box h2 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: normal;
+}
+
+.saved-box ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.saved-box li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0;
+  padding: 4px 0;
+  font-size: 15px;
+}
+
+.saved-box .empty {
+  color: #5c564c;
 }

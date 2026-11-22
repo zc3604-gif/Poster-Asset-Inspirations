@@ -7,16 +7,30 @@ const replicateProxy =
 const modelVersion =
   "meta/meta-llama-3-8b-instruct:5a6809ca6288247d06daf6365557e5e429063f32a21146b2a807c682652136b8";
 
+const savedKey = "poster-saved-words";
+const saved = new Set(loadSaved());
+
 let promptField;
 let askButton;
 let replyDiv;
+let savedList;
 let busy = false;
 
 function setup() {
   noCanvas();
 
+  const box = createDiv();
+  box.class("saved-box");
+  box.parent(document.body);
+  createElement("h2", "Saved").parent(box);
+  savedList = createElement("ul");
+  savedList.parent(box);
+  renderSaved();
+
   createElement("h1", "20 items");
-  createP("One prompt. Twenty short items for a poster.").class("note");
+  createP("One prompt. Twenty short items for a poster. Star one to keep it.").class(
+    "note"
+  );
 
   promptField = createInput("dance");
   promptField.elt.addEventListener("keydown", (event) => {
@@ -73,9 +87,71 @@ function showItems(items) {
   list.parent(replyDiv);
   for (const item of items) {
     const row = createElement("li");
-    row.elt.textContent = item;
     row.parent(list);
+
+    const label = createSpan("");
+    label.elt.textContent = item;
+    label.parent(row);
+
+    const star = createButton(saved.has(item) ? "★" : "☆");
+    star.class("star");
+    star.attribute("aria-label", "Save " + item);
+    star.elt.dataset.item = item;
+    star.parent(row);
+    star.mousePressed(() => toggleSaved(item));
   }
+}
+
+function toggleSaved(item) {
+  if (saved.has(item)) saved.delete(item);
+  else saved.add(item);
+  persistSaved();
+  renderSaved();
+  refreshStars();
+}
+
+function renderSaved() {
+  savedList.html("");
+  if (saved.size === 0) {
+    const empty = createElement("li", "None yet");
+    empty.class("empty");
+    empty.parent(savedList);
+    return;
+  }
+
+  for (const word of saved) {
+    const row = createElement("li");
+    row.parent(savedList);
+
+    const label = createSpan("");
+    label.elt.textContent = word;
+    label.parent(row);
+
+    const remove = createButton("×");
+    remove.class("remove");
+    remove.attribute("aria-label", "Remove " + word);
+    remove.parent(row);
+    remove.mousePressed(() => toggleSaved(word));
+  }
+}
+
+function refreshStars() {
+  for (const button of document.querySelectorAll("button.star")) {
+    button.textContent = saved.has(button.dataset.item) ? "★" : "☆";
+  }
+}
+
+function loadSaved() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(savedKey) || "[]");
+    return Array.isArray(stored) ? stored.filter((word) => typeof word === "string") : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function persistSaved() {
+  localStorage.setItem(savedKey, JSON.stringify([...saved]));
 }
 
 function itemsFromText(text) {
